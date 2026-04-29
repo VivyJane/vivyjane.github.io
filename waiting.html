@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!--waiting.html-->
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>移动学工</title>
+  <style>
+  body {
+    margin: 0;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    flex-direction: column;
+    gap: 8px; /* ← 调小了间距，可根据需要改为 4px、6px 等 */
+  }
+  img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  #loading-text {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+    line-height: 1; /* 避免额外行高影响间距 */
+  }
+</style>
+</head>
+<body>
+  <div id="content">
+    <img src="load.gif" alt="加载中">
+    <p id="loading-text">加载中...</p>
+  </div>
+  <script>
+    // 获取目标页面
+    const urlParams = new URLSearchParams(window.location.search);
+    let target = urlParams.get('target');
+
+    // 安全白名单（防止开放重定向）
+    const allowed = ['list.html', 'info.html', 'workshop.html', 'index.html'];
+    if (!target || !allowed.includes(target)) {
+      target = 'index.html'; // 默认 fallback
+    }
+
+    // 根据 target 设置不同的延迟时间（单位：毫秒）
+    let delay;
+    if (target === 'workshop.html') {
+      document.getElementById('content').style.display = 'none';
+      delay = Math.floor(Math.random() * 1000) + 4000;  
+    } else if (target === 'list.html') {
+      delay = Math.floor(Math.random() * 1000) + 3000;  
+    } else if (target === 'info.html') {
+      document.getElementById('content').style.display = 'none';
+      delay = 10;                                      
+    } else {
+      // info.html 或其他情况使用默认随机 2~9 秒
+      delay = Math.floor(Math.random() * 8000) + 2000;
+    }
+
+    setTimeout(() => {
+      window.location.href = target;
+    }, delay);
+  </script>
+</body>
+</html>

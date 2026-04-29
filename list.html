@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<!-- list.html -->
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>请假管理</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #f5f7fa;
+      color: #333;
+      font-family: Arial, sans-serif;
+      font-size: 0.97em;
+    }
+
+    .header {
+      background-color: #f0f8ff;
+      padding: 0.625em;
+      font-size: inherit;
+      line-height: 1.4;
+      color: #333;
+    }
+
+    .header a {
+      text-decoration: none;
+      color: #007bff;
+    }
+
+    .header a:hover {
+      text-decoration: underline;
+    }
+
+    .main {
+      padding: 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 100px);
+    }
+
+    .title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .title h2 {
+      font-size: 1.1em;
+      color: #333;
+    }
+
+    .status-select {
+      background-color: white;
+      border-radius: 20px;
+      padding: 8px 15px;
+      border: 1px solid #d9e4f0;
+      font-size: 0.96em;
+      color: #1a73e8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .record-list {
+      margin-top: 20px;
+    }
+
+    .record-item {
+      background-color: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      cursor: pointer;
+      transition: transform 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .record-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .record-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .record-type {
+      font-size: 1.16em;
+      font-weight: 600;
+    }
+
+    .record-time {
+      color: #666;
+      font-size: 0.9em;
+    }
+
+    .record-details {
+      margin-top: 10px;
+    }
+
+    .detail-row {
+      margin-bottom: 8px;
+      color: #666;
+      font-size: 0.97em;
+    }
+
+    .reason {
+      color: #666;
+      font-size: 0.97em;
+    }
+
+    .status {
+      color: #1a73e8;
+      font-size: 1.03em;
+      margin-top: 10px;
+      font-weight: 500;
+    }
+
+    .apply-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 240px;
+      height: 50px;
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-size: 1.16em;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+      font-family: Arial, sans-serif;
+    }
+
+    .apply-btn:hover {
+      background-color: #1559c7;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 顶部导航 -->
+  <div class="header">
+    <a href="index.html" style="color: blue; text-decoration: none;">首页</a> > 请假管理
+  </div>
+
+  <!-- 主内容区 -->
+  <div class="main">
+    <div class="title">
+      <h2>申请记录</h2>
+      <div class="status-select">全部状态 ▼</div>
+    </div>
+
+    <div class="record-list">
+      <!-- 第1条 (index 0) -->
+      <a href="waiting.html?target=info.html" class="record-item">
+        <div class="record-header">
+          <div class="record-type">其它</div>
+          <div class="record-time"><span id="record-date">2025-12-13</span></div>
+        </div>
+        <div class="record-details">
+          <div class="detail-row">开始时间: <span id="start-time">2025-12-13 08:30</span></div>
+          <div class="detail-row">结束时间: <span id="end-time">2025-12-13 21:30</span></div>
+          <div class="reason">请假理由: <span id="leave-reason">吃饭</span></div>
+          <div class="status">审核通过</div>
+        </div>
+      </a>
+
+      <!-- 动态占位：第2~15条 (index 1~14) -->
+      <!-- 我们用循环生成结构，但为了清晰，这里手动写出14条 -->
+      <!-- 每条都有唯一ID：start-time1 ~ start-time14 等 -->
+
+      <!-- 第2条 -->
+      <div class="record-item">
+        <div class="record-header">
+          <div class="record-type">其它</div>
+          <div class="record-time"><span id="record-date1">2025-11-29</span></div>
+        </div>
+        <div class="record-details">
+          <div class="detail-row">开始时间: <span id="start-time1">2025-11-29 12:30</span></div>
+          <div class="detail-row">结束时间: <span id="end-time1">2025-11-29 17:45</span></div>
+          <div class="reason">请假理由: <span id="leave-reason1">吃饭</span></div>
+          <div class="status">审核通过</div>
+        </div>
+      </div>
+
+      <!-- 第3条 -->
+      <div class="record-item">
+        <div class="record-header">
+          <div class="record-type">其它</div>
+          <div class="record-time"><span id="record-date2">2025-11-15</span></div>
+        </div>
+        <div class="record-details">
+          <div class="detail-row">开始时间: <span id="start-time2">2025-11-15 08:20</span></div>
+          <div class="detail-row">结束时间: <span id="end-time2">2025-11-15 17:50</span></div>
+          <div class="reason">请假理由: <span id="leave-reason2">吃饭</span></div>
+          <div class="status">审核通过</div>
+        </div>
+      </div>
+
+      <!-- 第4条 -->
+      <div class="record-item">
+        <div class="record-header">
+          <div class="record-type">节假日及寒暑假请假</div>
+          <div class="record-time"><span id="record-date3">2025-10-17</span></div>
+        </div>
+        <div class="record-details">
+          <div class="detail-row">开始时间: <span id="start-time3">2025-10-17 18:15</span></div>
+          <div class="detail-row">结束时间: <span id="end-time3">2025-10-19 17:40</span></div>
+          <div class="reason">请假理由: <span id="leave-reason3">回家</span></div>
+          <div class="status">审核通过</div>
+        </div>
+      </div>
+
+      <!-- 第5条 -->
+      <div class="record-item">
+        <div class="record-header">
+          <div class="record-type">节假日及寒暑假请假</div>
+          <div class="record-time"><span id="record-date4">2025-09-30</span></div>
+        </div>
+        <div class="record-details">
+          <div class="detail-row">开始时间: <span id="start-time4">2025-09-30 18:10</span></div>
+          <div class="detail-row">结束时间: <span id="end-time4">2025-10-08 17:35</span></div>
+          <div class="reason">请假理由: <span id="leave-reason4">回家</span></div>
+          <div class="status">审核通过</div>
+        </div>
+      </div>
+
+      <!-- 第6条 -->
+      <div class="record-item">
+        <div class="record-header">
+          <div class="record-type">其它</div>
+          <div class="record-time"><span id="record-date5">2025-09-20</span></div>
+        </div>
+        <div class="record-details">
+          <div class="detail-row">开始时间: <span id="start-time5">2025-09-20 08:05</span></div>
+          <div class="detail-row">结束时间: <span id="end-time5">2025-09-20 19:30</span></div>
+          <div class="reason">请假理由: <span id="leave-reason5">吃饭</span></div>
+          <div class="status">审核通过</div>
+        </div>
+      </div>
+
+      <!-- 第7条 -->
+      <div class="record-item">
+        <div class="record-header">
+          <div class="record-type">节假日及寒暑假请假</div>
+          <div class="record-time"><span id="record-date6">2025-09-12</span></div>
+        </div>
+        <div class="record-details">
+          <div class="detail-row">开始时间: <span id="start-time6">2025-09-12 18:05</span></div>
+          <div class="detail-row">结束时间: <span id="end-time6">2025-09-14 17:30</span></div>
+          <div class="reason">请假理由: <span id="leave-reason6">回家</span></div>
+          <div class="status">审核通过</div>
+        </div>
+      </div>
+
+      <!-- 第8条 -->
+      <div class="record-item">
+        <div class="record-header">
+          <div class="record-type">其它</div>
+          <div class="record-time"><span id="record-date7">2025-09-05</span></div>
+        </div>
+        <div class="record-details">
+          <div class="detail-row">开始时间: <span id="start-time7">2025-09-05 18:05</span></div>
+          <div class="detail-row">结束时间: <span id="end-time7">2025-09-07 17:30</span></div>
+          <div class="reason">请假理由: <span id="leave-reason7">吃饭</span></div>
+          <div class="status">审核通过</div>
+        </div>
+      </div>
+
+      <!-- 第9条 -->
+<div class="record-item">
+  <div class="record-header">
+    <div class="record-type">其它</div>
+    <div class="record-time"><span id="record-date8">2025-06-10</span></div>
+  </div>
+  <div class="record-details">
+    <div class="detail-row">开始时间: <span id="start-time8">2025-06-10 12:05</span></div>
+    <div class="detail-row">结束时间: <span id="end-time8">2025-06-10 13:30</span></div>
+    <div class="reason">请假理由: <span id="leave-reason8">吃饭</span></div>
+    <div class="status">审核通过</div>
+  </div>
+</div>
+
+<!-- 第10条 -->
+<div class="record-item">
+  <div class="record-header">
+    <div class="record-type">节假日及寒暑假请假</div>
+    <div class="record-time"><span id="record-date9">2025-06-06</span></div>
+  </div>
+  <div class="record-details">
+    <div class="detail-row">开始时间: <span id="start-time9">2025-06-06 18:20</span></div>
+    <div class="detail-row">结束时间: <span id="end-time9">2025-06-08 17:10</span></div>
+    <div class="reason">请假理由: <span id="leave-reason9">回家</span></div>
+    <div class="status">审核通过</div>
+  </div>
+</div>
+
+<!-- 第11条 -->
+<div class="record-item">
+  <div class="record-header">
+    <div class="record-type">其它</div>
+    <div class="record-time"><span id="record-date10">2025-06-03</span></div>
+  </div>
+  <div class="record-details">
+    <div class="detail-row">开始时间: <span id="start-time10">2025-06-03 17:02</span></div>
+    <div class="detail-row">结束时间: <span id="end-time10">2025-06-03 19:15</span></div>
+    <div class="reason">请假理由: <span id="leave-reason10">吃饭</span></div>
+    <div class="status">审核通过</div>
+  </div>
+</div>
+
+<!-- 第12条 -->
+<div class="record-item">
+  <div class="record-header">
+    <div class="record-type">其它</div>
+    <div class="record-time"><span id="record-date11">2025-05-27</span></div>
+  </div>
+  <div class="record-details">
+    <div class="detail-row">开始时间: <span id="start-time11">2025-05-27 11:55</span></div>
+    <div class="detail-row">结束时间: <span id="end-time11">2025-05-27 13:40</span></div>
+    <div class="reason">请假理由: <span id="leave-reason11">吃饭</span></div>
+    <div class="status">审核通过</div>
+  </div>
+</div>
+
+<!-- 第13条 -->
+<div class="record-item">
+  <div class="record-header">
+    <div class="record-type">节假日及寒暑假请假</div>
+    <div class="record-time"><span id="record-date12">2025-05-23</span></div>
+  </div>
+  <div class="record-details">
+    <div class="detail-row">开始时间: <span id="start-time12">2025-05-23 18:30</span></div>
+    <div class="detail-row">结束时间: <span id="end-time12">2025-05-25 17:20</span></div>
+    <div class="reason">请假理由: <span id="leave-reason12">回家</span></div>
+    <div class="status">审核通过</div>
+  </div>
+</div>
+
+<!-- 第14条 -->
+<div class="record-item">
+  <div class="record-header">
+    <div class="record-type">其它</div>
+    <div class="record-time"><span id="record-date13">2025-05-20</span></div>
+  </div>
+  <div class="record-details">
+    <div class="detail-row">开始时间: <span id="start-time13">2025-05-20 16:55</span></div>
+    <div class="detail-row">结束时间: <span id="end-time13">2025-05-20 19:05</span></div>
+    <div class="reason">请假理由: <span id="leave-reason13">吃饭</span></div>
+    <div class="status">审核通过</div>
+  </div>
+</div>
+
+<!-- 第15条 -->
+<div class="record-item">
+  <div class="record-header">
+    <div class="record-type">其它</div>
+    <div class="record-time"><span id="record-date14">2025-05-13</span></div>
+  </div>
+  <div class="record-details">
+    <div class="detail-row">开始时间: <span id="start-time14">2025-05-13 12:10</span></div>
+    <div class="detail-row">结束时间: <span id="end-time14">2025-05-13 13:25</span></div>
+    <div class="reason">请假理由: <span id="leave-reason14">吃饭</span></div>
+    <div class="status">审核通过</div>
+  </div>
+</div>
+    </div>
+  </div>
+
+  <button class="apply-btn">申请</button>
+
+  <script>
+    function isWeekend(date) {
+      const day = date.getDay();
+      return day === 6 || day === 0; // 周六 or 周日
+    }
+
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function formatDate(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatDateTime(date) {
+      return formatDate(date) + ' ' +
+        String(date.getHours()).padStart(2, '0') + ':' +
+        String(date.getMinutes()).padStart(2, '0');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const configStr = localStorage.getItem('leaveConfig');
+      if (!configStr) return;
+
+      try {
+        const config = JSON.parse(configStr);
+        const rawStartTime = config.field_3;
+        const rawEndTime = config.field_4;
+        const reason0 = config.field_8 || '吃饭';
+
+        if (!rawStartTime || typeof rawStartTime !== 'string') return;
+
+        let baseDate = new Date(rawStartTime.replace(' ', 'T'));
+        if (isNaN(baseDate.getTime())) return;
+
+        // --- 第1条：直接填充 ---
+        document.getElementById('start-time').textContent = rawStartTime.replace(/:00$/, '');
+        document.getElementById('end-time').textContent = (rawEndTime || '').replace(/:00$/, '') || '—';
+        document.getElementById('leave-reason').textContent = reason0;
+        document.getElementById('record-date').textContent = rawStartTime.substring(0, 10);
+
+        // --- 第2~15条（共14条）---
+        let currentDate = new Date(baseDate.getTime());
+
+        for (let i = 1; i <= 14; i++) {
+          const daysBack = getRandomInt(3, 10);
+          currentDate.setDate(currentDate.getDate() - daysBack);
+
+          let recordType, reason, startTime, endTime, displayDate;
+
+          if (isWeekend(currentDate)) {
+            // 找到最近的周五
+            const day = currentDate.getDay();
+            const friday = new Date(currentDate);
+            if (day === 6) friday.setDate(friday.getDate() - 1);
+            else if (day === 0) friday.setDate(friday.getDate() - 2);
+            else {
+              // 安全兜底（理论上不会触发）
+              friday.setDate(friday.getDate() - ((day + 1) % 7));
+            }
+
+            recordType = '节假日及寒暑假请假';
+            reason = '回家';
+            // 周五 18:00 + 随机分钟
+            const startMin = getRandomInt(0, 59);
+            startTime = new Date(friday.getFullYear(), friday.getMonth(), friday.getDate(), 18, startMin);
+            // 周日 17:00 + 随机分钟
+            const endMin = getRandomInt(0, 59);
+            endTime = new Date(friday.getFullYear(), friday.getMonth(), friday.getDate() + 2, 17, endMin);
+            displayDate = formatDate(friday);
+          } else {
+            recordType = '其它';
+            reason = '吃饭';
+            const useNoon = Math.random() > 0.5;
+
+            if (useNoon) {
+              // 午休段
+              const startHour = 11;
+              const startMin = getRandomInt(40, 70); // 11:40 ~ 12:10 → 实际分钟 40~70
+              const adjustedStartHour = startMin >= 60 ? 12 : 11;
+              const finalStartMin = startMin % 60;
+
+              const endHour = 13;
+              const endMin = getRandomInt(20, 45); // 13:20 ~ 13:45
+
+              startTime = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), adjustedStartHour, finalStartMin);
+              endTime = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), endHour, endMin);
+            } else {
+              // 傍晚段
+              const startHour = 16;
+              const startMin = getRandomInt(40, 68); // 16:40 ~ 17:08 → 分钟 40~68
+              const adjustedStartHour = startMin >= 60 ? 17 : 16;
+              const finalStartMin = startMin % 60;
+
+              const endHour = 18;
+              const endMin = getRandomInt(50, 90); // 18:50 ~ 19:30 → 分钟 50~90
+              const adjustedEndHour = endMin >= 60 ? 19 : 18;
+              const finalEndMin = endMin % 60;
+
+              startTime = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), adjustedStartHour, finalStartMin);
+              endTime = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), adjustedEndHour, finalEndMin);
+            }
+            displayDate = formatDate(currentDate);
+          }
+
+          // 更新对应 ID
+          const idx = i;
+          const typeEl = document.querySelector(`.record-item:nth-child(${idx + 1}) .record-type`);
+          if (typeEl) typeEl.textContent = recordType;
+
+          document.getElementById(`record-date${idx}`).textContent = displayDate;
+          document.getElementById(`start-time${idx}`).textContent = formatDateTime(startTime);
+          document.getElementById(`end-time${idx}`).textContent = formatDateTime(endTime);
+          document.getElementById(`leave-reason${idx}`).textContent = reason;
+        }
+
+      } catch (e) {
+        console.warn('动态填充失败，保留默认记录:', e);
+      }
+    });
+  </script>
+</body>
+</html>

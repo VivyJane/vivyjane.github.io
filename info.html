@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<!--info.html-->
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>请假管理</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+body { 
+    font-family: Arial, sans-serif; 
+    margin: 0;
+    padding-top: 2em;
+    font-size: 0.97em;
+}
+.user-info {
+    margin-bottom: 1.25em;
+    display: flex;
+    align-items: center;
+    margin-left: 1.25em;
+    margin-top: 1.25em;
+}
+.avatar {
+    width: 2.5em;
+    height: 2.5em;
+    border-radius: 50%;
+    background-color: rgb(240,245,248);
+    margin-right: 0.625em;
+}
+.user-text {
+    display: inline-block;
+}
+.user-text h4, 
+.user-text p {
+    margin: 0;
+}
+.user-text p {
+    color: gray;
+    font-size: 0.9em;
+}
+.header {
+  background-color: #f0f8ff;
+  padding: 0.625em;             /* ≈10px（基于默认 16px 字体） */
+  position: fixed;              /* 固定在视口顶部 */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;                /* 确保在其他内容之上 */
+  box-sizing: border-box;       /* 确保 padding 不影响宽度计算 */
+}
+.content { 
+    margin: 1.25em;
+}
+.info {
+    padding-left: 0em;
+    margin-bottom: 1.25em;
+}
+.info, .progress {
+    margin-bottom: 1.25em;
+    position: relative;
+    padding-left: 0em;
+}
+.info::before, .progress::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 2.5px;
+    height: 1.2em;
+    width: 0.25em;
+    background-color: #007bff;
+}
+.progress {
+    margin-top: 2em; 
+}
+.progress::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 5.1px;
+    height: 1em;
+    width: 0.25em;
+    background-color: #007bff;
+}
+.stamp { 
+    float: right; 
+    margin-top: -3.125em;
+}
+.info p { 
+    margin: 0; 
+    line-height: 1.88; 
+    font-size: 0.96em;
+}
+.info span:first-child { 
+    color: rgb(161, 161, 161); 
+    margin-right: 0.5em;
+    flex-shrink: 0;
+    min-width: 5em;
+}
+.progress div { 
+    display: flex; 
+    align-items: center; 
+    margin: 0; 
+    line-height: 1.7;
+    font-size: 0.9em;
+    margin-bottom: -1.1em;
+}
+.progress .check-mark {
+    display: inline-block;
+    width: 1.25em;
+    height: 1.25em;
+    border: 0.0625em solid #4b7ccb;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 1.125em;
+    color: #4b7ccb;
+    font-size: 0.9em;
+    margin-right: 0.625em;
+}
+.progress .dot-mark {
+    display: inline-block;
+    width: 1.25em;
+    height: 1.25em;
+    border: 0.0625em solid #4b7ccb;
+    border-radius: 50%;
+    position: relative;
+    margin-right: 0.625em;
+}
+.progress .dot-mark span {
+    display: block;
+    width: 0.5em;
+    height: 0.5em;
+    background-color: #4b7ccb;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.progress h3 {
+    margin-bottom: 0em;
+}
+.progress .time {
+    margin-left: auto;
+    color: #a1a1a1;
+    font-size: 0.9em;
+}
+.progress .sub-info {
+    color: #a1a1a1;
+    margin-left: 1.875em;
+    font-size: 0.9em;
+    margin-top: 0.7em;
+    margin-bottom: 0;
+    line-height: 1;
+}
+.progress .sub-info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 1.875em;
+    margin-top: -0.1em; 
+    margin-bottom: -0.5em;
+    line-height: 1;
+    color: #a1a1a1;
+    font-size: 0.9em;
+}
+.progress .sub-info-row p:last-child {
+    cursor: pointer;
+}
+</style>
+</head>
+
+<div id="configPanel" style="display:none; position:fixed; bottom:0; left:0; right:0; background:#f8f9fa; border-top:2px solid #007bff; padding:1em; z-index:10000; max-height:70vh; overflow-y:auto; font-size:14px; box-shadow:0 -2px 10px rgba(0,0,0,0.1);">
+  
+  <button onclick="autoSetToToday()" style="padding:6px 8px; font-size: 13px;background:#28a745; color:white; border:none; margin-right:8px;">设为今天并保存</button>
+  <button onclick="saveToLocal()" style="padding:6px 16px; font-size: 13px;background:#007bff; color:white; border:none; margin-right:8px;">保 存</button>
+  <button onclick="hidePanel()" style="padding:8px 16px; font-size: 13px; background:#6c757d; color:white; border:none; float: right;">隐 藏</button>
+  <button onclick="resetToDefault()" style="padding:3px 4px; font-size: 12px; background:#dc3545; color:white; border:none; float: right; margin-right: 17px;">恢复默认</button>
+  <div id="configFields"></div>
+  <button onclick="hidePanel()" style="padding:8px 20px; background:#6c757d; color:white; border:none;float: right;">隐 藏</button>
+  <button onclick="autoSetToToday()" style="padding:10px 8px; font-size: 14px;background:#28a745; color:white; border:none; margin-right:10px;">设为今天并保存</button>
+  <button onclick="saveToLocal()" style="padding:10px 20px; font-size: 14px;background:#007bff; color:white; border:none; margin-left:1px;margin-right:8px;">保 存</button>
+  </div>
+
+<script>
+// === 默认配置 ===
+const defaultConfig = {
+  user_h4_name: "吴浩斌",
+  user_p_id: "202342010323",
+  handler_role: "大队长",
+  teacher_time: "2025-09-05 10:00",
+  apply_time: "2025-09-05 10:00"
+};
+
+// 记录哪些 .info p 原本包含 pass.png（在 DOM 加载后初始化）
+let originalPassImageIndices = new Set();
+
+// === 初始化配置面板 ===
+function initConfigPanel() {
+  // 记录原始带 pass.png 的 .info p 行索引
+  originalPassImageIndices = new Set();
+  document.querySelectorAll('.info p').forEach((p, i) => {
+    if (p.querySelector('img[src="pass.png"]')) {
+      originalPassImageIndices.add(i);
+    }
+  });
+
+  const configFields = document.getElementById('configFields');
+  if (!configFields) return;
+
+  const saved = localStorage.getItem('leaveConfig');
+  const data = saved ? JSON.parse(saved) : {};
+
+  configFields.innerHTML = '';
+
+  // 收集所有 .info p 字段
+  let infoFields = [];
+  document.querySelectorAll('.info p').forEach((p, i) => {
+    const keySpan = p.querySelector('span:first-child');
+    if (!keySpan) return;
+
+    const keyLabel = keySpan.textContent.trim().replace(/:$/, '');
+    const value = p.textContent.replace(keySpan.textContent, '').trim();
+    const inputName = `field_${i}`;
+    const savedValue = data[inputName] !== undefined ? data[inputName] : value;
+
+    infoFields.push({
+      name: inputName,
+      label: keyLabel,
+      value: savedValue,
+      originalIndex: i
+    });
+  });
+
+  // 构建字段列表（每项独立 hint）
+  let orderedFields = [];
+
+  // --- 用户基本信息 ---
+  const h4Val = data.user_h4_name || (document.querySelector('.user-text h4')?.textContent?.trim() || defaultConfig.user_h4_name);
+  orderedFields.push({ name: 'user_h4_name', label: '用户姓名', value: h4Val, hint: '吴浩斌' });
+
+  const idVal = data.user_p_id || (document.querySelector('.user-text > p:not([class])')?.textContent?.trim() || defaultConfig.user_p_id);
+  orderedFields.push({ name: 'user_p_id', label: '用户学号', value: idVal, hint: '202342010323' });
+
+  // --- 显式定义每个 .info 字段的独立提示词 ---
+  const infoFieldHints = {
+    '开始时间': '2025-11-30 10:59:00',
+    '结束时间': '2025-11-30 15:18:00',
+    '统计时长': '0天04小时19分钟',
+    '请假理由': '吃饭',
+    '请假去向': '广东省广州市天河区',
+    '详细地址': '广东省广州市天河区正佳广场',
+    '请假状态': '审核通过',
+    '销假状态': '不填',
+    '请假附件': '不填',
+  };
+
+  // 分离请假类型（要放到最后）
+  const leaveTypeField = infoFields.find(f => f.label === '请假类型');
+  const otherInfoFields = infoFields.filter(f => f.label !== '请假类型');
+
+  // 按页面原始顺序添加其他 .info 字段，并赋予独立 hint
+  otherInfoFields.forEach(f => {
+    const hint = infoFieldHints[f.label] !== undefined ? infoFieldHints[f.label] : '--';
+    orderedFields.push({ ...f, hint: hint });
+  });
+
+  // 请假类型放最后
+  if (leaveTypeField) {
+    orderedFields.push({ ...leaveTypeField, hint: '其他 或 节假日及寒暑假请假' });
+  }
+
+  // --- 进度区域字段 ---
+  const roleRow = Array.from(document.querySelectorAll('.progress .sub-info-row')).find(r =>
+    r.querySelector('p') && ['大队长', '辅导员'].includes(r.querySelector('p').textContent.trim())
+  );
+  const roleVal = data.handler_role || (roleRow?.querySelector('p')?.textContent?.trim() || defaultConfig.handler_role);
+  orderedFields.push({ name: 'handler_role', label: '辅导员', value: roleVal, hint: '辅导员' });
+
+  const timeEls = document.querySelectorAll('.progress .time');
+  const teacherTimeEl = timeEls.length > 1 ? timeEls[1] : timeEls[0];
+  const teacherTimeVal = data.teacher_time || (teacherTimeEl?.textContent?.trim() || defaultConfig.teacher_time);
+  orderedFields.push({ name: 'teacher_time', label: '办理时间', value: teacherTimeVal, hint: '2025-11-29 12:17' });
+
+  const applyDivs = Array.from(document.querySelectorAll('div')).filter(div => {
+    const pText = div.querySelector('p')?.textContent || '';
+    return pText.includes('申请');
+  });
+  const applyTimeEl = applyDivs[0]?.querySelector('.time');
+  const applyTimeVal = data.apply_time || (applyTimeEl?.textContent?.trim() || defaultConfig.apply_time);
+  orderedFields.push({ name: 'apply_time', label: '申请时间', value: applyTimeVal, hint: '2025-11-29 09:42' });
+
+  // 渲染所有字段
+  orderedFields.forEach(field => {
+    createInput(field.name, field.label, field.value, field.hint);
+  });
+
+  // 应用配置到页面
+  applyConfigToPage(data);
+}
+// 创建输入框（支持每项独立的格式提示）
+function createInput(name, label, value, hint = "123") {
+  const div = document.createElement('div');
+  div.innerHTML = `
+  <div style="display:flex; font-size:13px; color:#444444; margin-bottom:0px;">
+    <span style="min-width:80px; flex-shrink:0;">${label}:</span>
+    <span>例:${escapeHtml(hint)}</span>
+  </div>
+  <input type="text" name="${name}" value="${escapeHtml(value)}"
+         style="width:100%; padding:3px; margin:2px ; font-size:14px; box-sizing:border-box;">
+  <br><br>
+`;
+  document.getElementById('configFields').appendChild(div);
+}
+
+// 安全更新函数：仅更新值文本，保留 HTML 结构和样式
+function safeUpdateP(p, keySpan, newValue) {
+  const valueNodes = Array.from(p.childNodes).filter(node => 
+    node !== keySpan && 
+    !(node.nodeType === Node.TEXT_NODE && node.textContent.trim() === '')
+  );
+
+  if (valueNodes.length > 0) {
+    let updated = false;
+    for (const node of valueNodes) {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        node.textContent = newValue;
+        updated = true;
+        break;
+      } else if (node.nodeType === Node.TEXT_NODE) {
+        node.textContent = newValue;
+        updated = true;
+        break;
+      }
+    }
+    if (!updated) {
+      p.appendChild(document.createTextNode(newValue));
+    }
+  } else {
+    p.appendChild(document.createTextNode(newValue));
+  }
+}
+
+// 应用配置到页面
+function applyConfigToPage(data) {
+  const infoPs = document.querySelectorAll('.info p');
+  infoPs.forEach((p, i) => {
+    const keySpan = p.querySelector('span:first-child');
+    if (!keySpan) return;
+    const inputName = `field_${i}`;
+    if (data[inputName] !== undefined) {
+      safeUpdateP(p, keySpan, data[inputName]);
+    }
+  });
+
+  if (data.user_h4_name && document.querySelector('.user-text h4')) {
+    document.querySelector('.user-text h4').textContent = data.user_h4_name;
+  }
+
+  if (data.user_p_id) {
+    const el = document.querySelector('.user-text > p:not([class])');
+    if (el) el.textContent = data.user_p_id;
+  }
+
+  const roleRow = Array.from(document.querySelectorAll('.progress .sub-info-row')).find(r =>
+    r.querySelector('p') && ['大队长', '辅导员'].includes(r.querySelector('p').textContent.trim())
+  );
+  if (data.handler_role && roleRow) {
+    roleRow.querySelector('p').textContent = data.handler_role;
+  }
+
+  const timeEls = document.querySelectorAll('.progress .time');
+  const teacherTimeEl = timeEls.length > 1 ? timeEls[1] : timeEls[0];
+  if (data.teacher_time && teacherTimeEl) {
+    teacherTimeEl.textContent = data.teacher_time;
+  }
+
+  const applyDivs = Array.from(document.querySelectorAll('div')).filter(div => {
+    const pText = div.querySelector('p')?.textContent || '';
+    return pText.includes('申请');
+  });
+  const applyTimeEl = applyDivs[0]?.querySelector('.time');
+  if (data.apply_time && applyTimeEl) {
+    applyTimeEl.textContent = data.apply_time;
+  }
+
+  if (data.user_h4_name) {
+    const subInfoEl = document.querySelector('.progress .sub-info');
+    if (subInfoEl) {
+      subInfoEl.textContent = data.user_h4_name;
+    }
+  }
+
+  // 恢复 pass.png（仅限原本有的行）
+  infoPs.forEach((p, i) => {
+    if (originalPassImageIndices.has(i) && !p.querySelector('img[src="pass.png"]')) {
+      const img = document.createElement('img');
+      img.src = 'pass.png';
+      img.style.cssText = 'float: right; margin-right: 0.7em; height: 3.3em; opacity: 0.9;';
+      p.appendChild(img);
+    }
+  });
+}
+
+// 保存并刷新（无提示）
+function saveToLocal() {
+  const data = {};
+  document.querySelectorAll('#configFields input').forEach(input => {
+    data[input.name] = input.value;
+  });
+  localStorage.setItem('leaveConfig', JSON.stringify(data));
+  location.reload();
+}
+
+function autoSetToToday() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const currentHour = now.getHours();
+  const currentMin = now.getMinutes();
+  const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+
+  const randomMinute = () => Math.floor(Math.random() * 60);
+
+  let startDateTime, endDateTime;
+
+  // 判断是否为工作日（周一到周五）
+  const isWorkday = dayOfWeek >= 1 && dayOfWeek <= 5;
+
+  if (isWorkday) {
+    // ========== 工作日逻辑：基于当前时间 ±1h / +2h，带边界约束 ==========
+    
+    // --- 开始时间 ---
+    const idealStartHour = currentHour - 1;
+    const idealStartMin = randomMinute();
+
+    if (currentHour >= 7) {
+      if (idealStartHour >= 7) {
+        startDateTime = new Date(year, now.getMonth(), day, idealStartHour, idealStartMin, 0);
+      } else {
+        // 回退到当前小时（或上一小时），至少早15分钟
+        let fallbackHour = currentHour;
+        let fallbackMin;
+        if (currentMin >= 15) {
+          fallbackMin = Math.max(0, currentMin - 15 - Math.floor(Math.random() * 15));
+        } else {
+          fallbackHour = currentHour - 1;
+          if (fallbackHour < 0) fallbackHour = 23;
+          fallbackMin = 45 + Math.floor(Math.random() * 15);
+        }
+        startDateTime = new Date(year, now.getMonth(), day, fallbackHour, fallbackMin, 0);
+      }
+    } else {
+      // 当前 < 7点，允许早于7点
+      startDateTime = new Date(year, now.getMonth(), day, idealStartHour, idealStartMin, 0);
+    }
+
+    // --- 结束时间 ---
+    const idealEndHour = currentHour + 2;
+    const idealEndMin = randomMinute();
+
+    if (currentHour <= 22) {
+      if (idealEndHour <= 22) {
+        endDateTime = new Date(year, now.getMonth(), day, idealEndHour, idealEndMin, 0);
+      } else {
+        // 回退到当前小时（或下一小时），至少晚15分钟
+        let fallbackHour = currentHour;
+        let fallbackMin;
+        if (currentMin <= 44) {
+          fallbackMin = currentMin + 15 + Math.floor(Math.random() * 15);
+          if (fallbackMin >= 60) fallbackMin = 59;
+        } else {
+          fallbackHour = currentHour + 1;
+          if (fallbackHour > 23) fallbackHour = 0;
+          fallbackMin = Math.floor(Math.random() * 15);
+        }
+        endDateTime = new Date(year, now.getMonth(), day, fallbackHour, fallbackMin, 0);
+      }
+    } else {
+      // 当前 > 22点，允许晚于22点
+      endDateTime = new Date(year, now.getMonth(), day, idealEndHour, idealEndMin, 0);
+    }
+
+  } else {
+    // ========== 节假日（周末）逻辑：固定 07:xx ~ 20:yy ==========
+    const startMin = randomMinute();
+    const endMin = randomMinute();
+
+    startDateTime = new Date(year, now.getMonth(), day, 7, startMin, 0);   // 07:xx:00
+    endDateTime = new Date(year, now.getMonth(), day, 20, endMin, 0);     // 20:yy:00
+
+    // 极小概率：end < start（如 07:50 vs 20:10 不会，但若逻辑错乱则防御）
+    if (endDateTime <= startDateTime) {
+      endDateTime.setHours(20, 59, 0); // 强制设为 20:59
+    }
+  }
+
+  // ========== 格式化时间字符串 ==========
+  const formatTime = (date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    const h = String(date.getHours()).padStart(2, '0');
+    const min = String(date.getMinutes()).padStart(2, '0');
+    return `${y}-${m}-${d} ${h}:${min}:00`;
+  };
+
+  const startTimeStr = formatTime(startDateTime);
+  const endTimeStr = formatTime(endDateTime);
+
+  // ========== 计算统计时长 ==========
+  let diffMs = endDateTime.getTime() - startDateTime.getTime();
+  if (diffMs < 0) {
+    diffMs += 24 * 60 * 60 * 1000; // 跨天补偿
+  }
+
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const days = Math.floor(totalSeconds / (24 * 3600));
+  const hours = Math.floor((totalSeconds % (24 * 3600)) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const durationStr = `${days}天${String(hours).padStart(2, '0')}小时${String(minutes).padStart(2, '0')}分钟`;
+
+  // ========== 申请时间 & 办理时间（保持不变）==========
+  const prevDayApply = new Date(now);
+  prevDayApply.setDate(now.getDate() - 1);
+  const applyMin = randomMinute();
+  const applyDateStr = `${prevDayApply.getFullYear()}-${String(prevDayApply.getMonth() + 1).padStart(2, '0')}-${String(prevDayApply.getDate()).padStart(2, '0')} 12:${String(applyMin).padStart(2, '0')}`;
+
+  const prevDayHandle = new Date(now);
+  prevDayHandle.setDate(now.getDate() - 1);
+  const handleMin = randomMinute();
+  const handleTimeStr = `${prevDayHandle.getFullYear()}-${String(prevDayHandle.getMonth() + 1).padStart(2, '0')}-${String(prevDayHandle.getDate()).padStart(2, '0')} 15:${String(handleMin).padStart(2, '0')}`;
+
+  // ========== 更新配置面板 ==========
+  let fieldIndices = {};
+  document.querySelectorAll('.info p').forEach((p, i) => {
+    const keySpan = p.querySelector('span:first-child');
+    if (keySpan) {
+      const label = keySpan.textContent.trim().replace(/:$/, '');
+      fieldIndices[label] = `field_${i}`;
+    }
+  });
+
+  document.querySelectorAll('#configFields input').forEach(input => {
+    switch (input.name) {
+      case fieldIndices['开始时间']:
+        input.value = startTimeStr;
+        break;
+      case fieldIndices['结束时间']:
+        input.value = endTimeStr;
+        break;
+      case fieldIndices['统计时长']:
+        input.value = durationStr;
+        break;
+      case 'apply_time':
+        input.value = applyDateStr;
+        break;
+      case 'teacher_time':
+        input.value = handleTimeStr;
+        break;
+    }
+  });
+
+  // 保存并刷新
+  saveToLocal();
+}
+
+// 恢复默认
+function resetToDefault() {
+  localStorage.removeItem('leaveConfig');
+  alert('已恢复默认配置！刷新页面生效');
+  location.reload();
+}
+
+// 隐藏/显示面板
+function hidePanel() {
+  document.getElementById('configPanel').style.display = 'none';
+}
+function showPanel() {
+  document.getElementById('configPanel').style.display = 'block';
+}
+
+// 防 XSS
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    initConfigPanel();
+
+    // 查找包含“辅导员审核”的 div（注意：不是 .sub-info-row）
+    const auditRows = document.querySelectorAll('.progress > div[style*="align-items"]');
+    let targetAgreeP = null;
+
+    for (let i = 0; i < auditRows.length; i++) {
+      const row = auditRows[i];
+      const pInRow = row.querySelector('p');
+      if (pInRow && pInRow.textContent.includes('辅导员审核')) {
+        // 找到下一个兄弟元素 .sub-info-row
+        let next = row.nextElementSibling;
+        while (next && !next.classList.contains('sub-info-row')) {
+          next = next.nextElementSibling;
+        }
+        if (next) {
+          const agreeP = next.querySelector('p:last-child');
+          if (agreeP && agreeP.textContent.trim() === '同意') {
+            targetAgreeP = agreeP;
+            break;
+          }
+        }
+      }
+    }
+
+    if (targetAgreeP) {
+      targetAgreeP.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        showPanel();
+      });
+    }
+  }, 200);
+});
+</script>
+
+<body>
+<div class="header">
+    <a href="index.html" style="color: blue; text-decoration: none;">首页</a> > 请假管理
+</div>
+
+
+<!-- 用户信息栏 -->
+<div class="user-info">
+    <div class="avatar"></div>
+    <div class="user-text">
+        <h4>吴浩斌</h4>
+        <p>202342010323</p>
+    </div>
+</div>
+
+<div style="height: 0.75em; background-color: #f3f4f8; margin: 0; padding: 0;"></div>
+
+<div class="content">
+    <div class="info">
+        <h3 style="font-size: 1.04em; margin-left: 0.5em;">请假信息</h3>
+        <p>
+            <span>请假类型:</span>其他
+            <img src="pass.png" style="float: right; margin-right: 0.7em; height: 3.3em; opacity: 0.9;">
+        </p>
+        <p><span>请假去向:</span></p>
+        <p><span>详细地址:</span></p>
+        <p><span>开始时间:</span></p>
+        <p><span>结束时间:</span></p>
+        <p><span>统计时长:</span>天小时分钟</p>
+        <p><span>紧急联系人:</span></p>
+        <p><span>紧急联系人电话:</span></p>
+        <p><span>请假理由:</span></p>
+        <p><span>请假状态:</span> <span style="color: rgb(34, 142, 241);">审核通过</span></p>
+        <p><span>销假状态:</span></p>
+        <p><span>请假附件:</span></p>
+    </div>
+
+    <div style="height: 0.75em; background-color: #f3f4f8; width: 100vw; position: absolute; left: 0; margin-top: -0.75em;"></div>
+
+    <div class="progress">
+        <h3 style="font-size: 1.04em; margin-left: 0.5em;">办理进度</h3>
+
+        <div style="align-items: center;">
+            <span class="check-mark">✓</span>
+            <p>申请 <span style="color: rgb(76,208,125);">申请</span></p>
+            <p class="time">2025-06-06 14:53</p>
+        </div>
+
+        <p class="sub-info">姓名</p>
+
+        <div style="align-items: center;">
+            <span class="check-mark">✓</span>
+            <p>辅导员审核 <span style="color: rgb(76,208,125);">审核通过</span></p>
+            <p class="time">2025-09-05 18:59</p>
+        </div>
+
+        <div class="sub-info-row">
+            <p>辅导员</p>
+            <p style="color: rgb(34, 142, 241);">同意</p><!--单击即可打开设置，无痕，不变色，无下划线-->
+        </div>
+
+        <div style="align-items: center;">
+            <span class="dot-mark">
+                <span></span>
+            </span>
+            <p style="margin: 0; font-size: 0.96em;">结束</p>
+        </div>
+    </div>
+</div>
+<div style="height: 5em; background-color: #f3f4f8; width: 100vw; position: absolute; left: 0; margin-top: 0.6em;"></div>
+</body>
+</html>
